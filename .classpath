@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre1.8.0_131/lib/org.eclipse.egit.github.core-2.1.5.jar" sourcepath="C:/Users/Metal/Downloads/org.eclipse.egit.github.core-2.1.5-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre1.8.0_131/lib/gson-2.8.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Metal/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.105.3.v20170228-0512.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Metal/.p2/pool/plugins/org.eclipse.swt_3.105.3.v20170228-0512.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jre1.8.0_131/lib/guava-21.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
