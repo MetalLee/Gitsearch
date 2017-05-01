@@ -44,7 +44,7 @@ public class GithubCodeSearch {
 		if(response.getBody()!=null){
 			result = (SearchCodeResult) response.getBody();
 		}
-		information = new SearchInformation(query, 1, result.getTotal_count()/100+1, result.getTotal_count(),"Java");
+		information = new SearchInformation(query, 1, result.getTotal_count()/100, result.getTotal_count(),"Java");
 		CodeURL[] codeURLs= result.getItems();
 		CodeDetail[] codeDetail = new CodeDetail[codeURLs.length];
 		for(int i=0;i<codeURLs.length;i++){

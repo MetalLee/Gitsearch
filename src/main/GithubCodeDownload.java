@@ -1,20 +1,24 @@
 package main;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
-import javax.net.ssl.HttpsURLConnection;
 
 public class GithubCodeDownload {
 	URL url;
 	
-	String savePath = null;
+	String savePath = "";
 	
 	String fileName ;
+	
+	File file = null;
 	
 	GithubCodeDownload() {
 	}
@@ -30,28 +34,33 @@ public class GithubCodeDownload {
 	public boolean Download() throws IOException {
 		//HttpURLConnection connection = (HttpURLConnection)url.openConnection();		
 		boolean success = false;
-		HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
-		connection.setConnectTimeout(15*1000);
-		connection.setRequestProperty("USER_AGENT", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-		InputStream inputStream = connection.getInputStream();
-		byte[] getData = new byte[inputStream.available()];
-		
-		inputStream.read(getData, 0, getData.length);
-		
-         
-        File saveDir = new File(savePath);  
-        if(!saveDir.exists()){  
-            saveDir.mkdir();  
-        }  
-        File file = new File(saveDir+File.separator+fileName);      
-        FileOutputStream fos = new FileOutputStream(file);       
-        fos.write(getData);   
-        if(fos!=null){  
-            fos.close();    
-        }  
-        if(inputStream!=null){  
-            inputStream.close();  
-        }  
+        URLConnection urlConnection = url.openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
+        httpURLConnection.setRequestMethod("GET");
+        httpURLConnection.setRequestProperty("Charset", "UTF-8");
+        httpURLConnection.connect();
+        
+        int fileLength = httpURLConnection.getContentLength();
+        System.out.println(fileLength);
+        BufferedInputStream bin = new BufferedInputStream(httpURLConnection.getInputStream());
+        String path = savePath + File.separator + fileName;
+        file = new File(path);
+        if(!file.getParentFile().exists()){
+        	file.getParentFile().mkdirs();
+        }
+        if(file.exists()){
+        }
+        OutputStream outputStream = new FileOutputStream(file);
+        int size = 0;
+        int len = 0;
+        byte[] buf = new byte[1024];
+        while((size = bin.read(buf)) != -1){
+        	len+=size;
+        	outputStream.write(buf, 0, size);
+        	System.out.println(len*100/fileLength);
+        }
+        bin.close();
+        outputStream.close();
         success = true;
         return success;
 	}

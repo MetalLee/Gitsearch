@@ -37,30 +37,28 @@ public class Main {
 		Shell shell = new Shell(display);
 		shell.setText("Git Search and Download");
 		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 11;
+		gridLayout.numColumns = 8;
 		shell.setLayout(gridLayout);
 		shell.setSize(1000, 600);
 		shell.setModified(false);
 		
 		//Authentication
-		GridData inputGridData = new GridData();
-		inputGridData.horizontalSpan = 2;
+		GridData loginGridData = new GridData(GridData.FILL_HORIZONTAL);
 		Label usernameLabel = new Label(shell, SWT.SINGLE);
 		usernameLabel.setText("Username:");
 		Text usernameInput = new Text(shell, SWT.SINGLE);
-		
-		usernameInput.setLayoutData(inputGridData);
+		usernameInput.setLayoutData(loginGridData);
 		usernameInput.setText("461741038@qq.com");
 		Label passwordLabel = new Label(shell, SWT.SINGLE);
 		passwordLabel.setText("Password:");
 		Text passwordInput = new Text(shell, SWT.PASSWORD);
-		passwordInput.setLayoutData(inputGridData);
+		passwordInput.setLayoutData(loginGridData);
 		passwordInput.setText("klee654944");
 		//Search option
 		Label keywordLabel = new Label(shell, SWT.SINGLE);
 		keywordLabel.setText("Keyword:");
 		Text keywordInput = new Text(shell, SWT.SINGLE);
-		keywordInput.setLayoutData(inputGridData);
+		keywordInput.setLayoutData(loginGridData);
 		
 		//Search Button
 		Button searchButton = new Button(shell, SWT.PUSH);
@@ -72,32 +70,28 @@ public class Main {
 		//Directory Selection
 		Button directoryButton = new Button(shell, SWT.PUSH);
 		directoryButton.setText("Browse");
-		GridData directoryGridData = new GridData();
-		directoryGridData.horizontalSpan = 2;
+		
 		Label directoryLabel = new Label(shell, SWT.SINGLE);
 		directoryLabel.setText("Please choose a directory");
-		directoryLabel.setLayoutData(directoryGridData);
+		directoryLabel.setLayoutData(loginGridData);
 		
 		DirectoryDialog directoryDialog = new DirectoryDialog(shell);
 		
 		//Result table
 		GridData tableGridData = new GridData(GridData.FILL_BOTH);
-		tableGridData.horizontalSpan = 11;
+		tableGridData.horizontalSpan = 8;
 		tableGridData.verticalSpan = 6;
 		Table table = new Table(shell, SWT.FULL_SELECTION|SWT.MULTI|SWT.VIRTUAL);
 		table.setLayoutData(tableGridData);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		String[] tableHeader = {"No.","File Name","File Owner","Repository","Download URL"};
+		String[] tableHeader = {"File Name","File Owner","Repository","Download URL"};
 		for(int i=0;i<tableHeader.length;i++){
 			TableColumn tableColumn = new TableColumn(table, SWT.NONE);
 			tableColumn.setText(tableHeader[i]);
 			if(tableHeader[i].equals("Download URL"))
 				tableColumn.setWidth(500);
-			else if(tableHeader[i].equals("No."))
-				tableColumn.setWidth(40);
 			else tableColumn.setWidth(150);
-			tableColumn.setResizable(false);
 		}
 		
 		//Page button
@@ -108,8 +102,8 @@ public class Main {
 		
 		//Page Information Label
 		Label pageLabel = new Label(shell, SWT.SINGLE);
-		pageLabel.setText("Page:1/1");
-		pageLabel.setLayoutData(inputGridData);
+		pageLabel.setText("Page:0/0");
+		pageLabel.setLayoutData(loginGridData);
 		//UI Update Runnable
 		Runnable pageUpdate = new Runnable() {			
 			@Override
@@ -139,9 +133,7 @@ public class Main {
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
-								if(directoryDialog.getFilterPath().equals(""))
-									directoryLabel.setText("Please choose a directory");
-								else directoryLabel.setText(directoryDialog.getFilterPath());
+								directoryLabel.setText(directoryDialog.getFilterPath());
 							}
 						});
 					}
@@ -172,12 +164,12 @@ public class Main {
 				//Search Begin
 
 				CodeDetail[] codeDetails;
-				table.removeAll();
+
 				try {
 					codeDetails = githubCodeSearch.Search(keywordInput.getText());
 					table.setItemCount(codeDetails.length);
 					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf(i+1),codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
+						table.getItem(i).setText(new String[]{codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
 					} 
 					new Thread(){
 						public void run() {
@@ -209,16 +201,14 @@ public class Main {
 			@Override
 			public void mouseDown(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				if(directoryLabel.getText().equals("Please choose a directory")) return ;
+				if(githubCodeDownload.getSavePath() == null) return ;
 				TableItem[] toDownload= table.getSelection();
 				for(int i=0;i<toDownload.length;i++){
 					try {
-						githubCodeDownload.setFileName(toDownload[i].getText(1));
+						githubCodeDownload.setFileName(toDownload[i].getText(0));
 						githubCodeDownload.setSavePath(directoryLabel.getText());
-					    githubCodeDownload.setURL(toDownload[i].getText(4));
-					    
+					    githubCodeDownload.setURL(toDownload[i].getText(3));
 					    boolean downloadSuccess = githubCodeDownload.Download();
-					    
 					    if(downloadSuccess){
 					    	toDownload[i].setBackground(display.getSystemColor(SWT.COLOR_GREEN));
 					    }
@@ -255,8 +245,7 @@ public class Main {
 					CodeDetail[] codeDetails = githubCodeSearch.NextPageSearch();
 					table.setItemCount(codeDetails.length);
 					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf((githubCodeSearch.getInformation().getCurrentPage()-1)*100+i+1),
-								codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
+						table.getItem(i).setText(new String[]{codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
 					}
 					new Thread(){
 						public void run() {
@@ -292,8 +281,7 @@ public class Main {
 					CodeDetail[] codeDetails = githubCodeSearch.PrepPageSearch();
 					table.setItemCount(codeDetails.length);
 					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf((githubCodeSearch.getInformation().getCurrentPage()-1)*100+i+1),
-								codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
+						table.getItem(i).setText(new String[]{codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
 					}
 					new Thread(){
 						public void run() {
