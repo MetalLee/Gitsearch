@@ -5,7 +5,7 @@ This is a tool that can help you search codes and download mutiple code file fro
 2. SWT 3.105;
 3. Egit 2.1.5;
 ## User Interface Overview
-![](http://i.imgur.com/KsKeV4T.png)
+![](http://i.imgur.com/aIVCXxS.png)
 ## How to Use
 ### Step1:Enter your username and password to Authentication:  
 ![](http://i.imgur.com/NkGYpyb.png)  
