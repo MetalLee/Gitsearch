@@ -7,7 +7,7 @@ This is a tool that can help you search codes and download mutiple code files fr
 ## User Interface Overview
 ![](http://i.imgur.com/aIVCXxS.png)
 ## How to Use
-### Step1:Enter your username and password for Authentication:  
+### Step1:Enter your username and password for authentication:  
 ![](http://i.imgur.com/NkGYpyb.png)  
 
 
