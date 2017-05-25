@@ -2,9 +2,8 @@ package main;
 
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
-
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -20,24 +19,17 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import bean.CodeDetail;
 
 
 public class Main {
 	public static void main(String[] args) throws IOException {
+		GithubRepositorySearch search = new GithubRepositorySearch();
 		
-		/* For download test
-		GithubCodeDownload githubCodeDownload = new GithubCodeDownload();
-		githubCodeDownload.setURL("https://raw.githubusercontent.com/ParkShinyoung/HelloWorld/db859f5ac0d17af8e997ec55664dbd5e995dbc79/src/egit/Egit.java");
-		githubCodeDownload.Download();
-		*/ 
-		GithubCodeDownload githubCodeDownload = new GithubCodeDownload();
-		GithubCodeSearch githubCodeSearch = new GithubCodeSearch();
 		Display display = new Display();
 		Shell shell = new Shell(display);
 		shell.setText("Git Search and Download");
 		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 11;
+		gridLayout.numColumns = 14;
 		shell.setLayout(gridLayout);
 		shell.setSize(1000, 600);
 		shell.setModified(false);
@@ -61,7 +53,10 @@ public class Main {
 		keywordLabel.setText("Keyword:");
 		Text keywordInput = new Text(shell, SWT.SINGLE);
 		keywordInput.setLayoutData(inputGridData);
-		
+		Label languageLabel = new Label(shell, SWT.SINGLE);
+		languageLabel.setText("Language:");
+		Text languageInput = new Text(shell, SWT.SINGLE);
+		languageInput.setLayoutData(inputGridData);
 		//Search Button
 		Button searchButton = new Button(shell, SWT.PUSH);
 		searchButton.setText("Search!");
@@ -82,20 +77,20 @@ public class Main {
 		
 		//Result table
 		GridData tableGridData = new GridData(GridData.FILL_BOTH);
-		tableGridData.horizontalSpan = 11;
+		tableGridData.horizontalSpan = 14;
 		tableGridData.verticalSpan = 6;
 		Table table = new Table(shell, SWT.FULL_SELECTION|SWT.MULTI|SWT.VIRTUAL);
 		table.setLayoutData(tableGridData);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		String[] tableHeader = {"No.","File Name","File Owner","Repository","Download URL"};
+		String[] tableHeader = {"No.","Repository Name","Owner","Size","Description"};
 		for(int i=0;i<tableHeader.length;i++){
 			TableColumn tableColumn = new TableColumn(table, SWT.NONE);
 			tableColumn.setText(tableHeader[i]);
-			if(tableHeader[i].equals("Download URL"))
+			if(tableHeader[i].equals("Description"))
 				tableColumn.setWidth(500);
-			else if(tableHeader[i].equals("No."))
-				tableColumn.setWidth(40);
+			else if(tableHeader[i].equals("No.")||tableHeader[i].equals("Size"))
+				tableColumn.setWidth(60);
 			else tableColumn.setWidth(150);
 			tableColumn.setResizable(false);
 		}
@@ -110,28 +105,24 @@ public class Main {
 		Label pageLabel = new Label(shell, SWT.SINGLE);
 		pageLabel.setText("Page:1/1");
 		pageLabel.setLayoutData(inputGridData);
-		//UI Update Runnable
+
+		
 		Runnable pageUpdate = new Runnable() {			
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				pageLabel.setText("Page:"+String.valueOf(githubCodeSearch.getInformation().getCurrentPage())+"/"+String.valueOf(githubCodeSearch.getInformation().getTotalPage()));
+				pageLabel.setText("Page:"+String.valueOf(search.getCurrentPage())+"/"+String.valueOf(search.getMaxPage()));
 			}
 		};
 		//Button Event
 		directoryButton.addMouseListener(new MouseListener() {
-			
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				directoryDialog.open();
-				System.out.println(directoryDialog.getFilterPath());
 				new Thread(){
 					public void run() {
 						display.syncExec(new Runnable() {
@@ -150,82 +141,54 @@ public class Main {
 			
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
-		searchButton.addMouseListener(new MouseListener() {
+		searchButton.addMouseListener(new MouseListener() {	
 			@Override
-			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
+			public void mouseUp(MouseEvent arg0) {			
+			}		
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				if(usernameInput.getText().isEmpty()||passwordInput.getText().isEmpty()||keywordInput.getText().isEmpty())
-					return ;
-				// TODO Auto-generated method stub	
-				String username = usernameInput.getText();
-				String password = passwordInput.getText();
-				githubCodeSearch.Authentication(username, password);
-				//Search Begin
-
-				CodeDetail[] codeDetails;
-				table.removeAll();
+				search.Authentication(usernameInput.getText(), passwordInput.getText());
 				try {
-					codeDetails = githubCodeSearch.Search(keywordInput.getText());
-					table.setItemCount(codeDetails.length);
-					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf(i+1),codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
-					} 
+					Repository[] repositories ;
+					repositories = search.Search(keywordInput.getText(), 1, languageInput.getText());
+					if(repositories == null) return ;
+					table.setItemCount(repositories.length);
+					for(int i=0;i<repositories.length;i++){
+						table.getItem(i).setText(new String[]{String.valueOf(i+1), repositories[i].getName(),repositories[i].getOwner().getLogin()
+								,String.valueOf(repositories[i].getSize()),repositories[i].getDescription()});
+					}
 					new Thread(){
 						public void run() {
 							display.syncExec(pageUpdate);
 						}
 					}.start();
-
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
-					
-			
+				
+			}	
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+
 			}
 		});
-        downloadButton.addMouseListener(new MouseListener() {
+		downloadButton.addMouseListener(new MouseListener() {
 			
 			@Override
-			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			public void mouseUp(MouseEvent arg0) {		
 			}
 			
 			@Override
-			public void mouseDown(MouseEvent arg0) {
-				// TODO Auto-generated method stub
+			public void mouseDown(MouseEvent arg0) {	
 				if(directoryLabel.getText().equals("Please choose a directory")) return ;
 				TableItem[] toDownload= table.getSelection();
 				for(int i=0;i<toDownload.length;i++){
 					try {
-						githubCodeDownload.setFileName(toDownload[i].getText(1));
-						githubCodeDownload.setSavePath(directoryLabel.getText());
-					    githubCodeDownload.setURL(toDownload[i].getText(4));
-					    
-					    boolean downloadSuccess = githubCodeDownload.Download();
-					    
-					    if(downloadSuccess){
-					    	toDownload[i].setBackground(display.getSystemColor(SWT.COLOR_GREEN));
-					    }
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
+						search.DownloadZip(Integer.valueOf(toDownload[i].getText(0)) - 1, directoryLabel.getText());
+					} catch (NumberFormatException | IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -234,29 +197,58 @@ public class Main {
 			
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			}
+		});
+        prevButton.addMouseListener(new MouseListener() {			
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+	
+			}
+			
+			@Override
+			public void mouseDown(MouseEvent arg0) {
+			    try {
+			    	Repository[] repositories;
+					repositories = search.PreviousPageSearch();
+					if(repositories == null) return ;
+					table.setItemCount(repositories.length);
+					for(int i=0;i<repositories.length;i++){
+						table.getItem(i).setText(new String[]{String.valueOf(i+1), repositories[i].getName(),repositories[i].getOwner().getLogin()
+								,String.valueOf(repositories[i].getSize()),repositories[i].getDescription()});
+					}
+					new Thread(){
+						public void run() {
+							display.syncExec(pageUpdate);
+						}
+					}.start();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+			
 			}
 		});
 		nextButton.addMouseListener(new MouseListener() {
 			
 			@Override
 			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+
 			}
 			
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				if(githubCodeSearch.getInformation().getCurrentPage() >= githubCodeSearch.getInformation().getTotalPage()) return;
-				table.removeAll();
-				try {
-					CodeDetail[] codeDetails = githubCodeSearch.NextPageSearch();
-					table.setItemCount(codeDetails.length);
-					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf((githubCodeSearch.getInformation().getCurrentPage()-1)*100+i+1),
-								codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
+			    try {
+			    	Repository[] repositories;
+					repositories = search.NextPageSearch();
+					if(repositories == null) return ;
+					table.setItemCount(repositories.length);
+					for(int i=0;i<repositories.length;i++){
+						table.getItem(i).setText(new String[]{String.valueOf(i+1), repositories[i].getName(),repositories[i].getOwner().getLogin()
+								,String.valueOf(repositories[i].getSize()),repositories[i].getDescription()});
 					}
 					new Thread(){
 						public void run() {
@@ -271,48 +263,10 @@ public class Main {
 			
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+
 			}
 		});
-        prevButton.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseDown(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				if(githubCodeSearch.getInformation().getCurrentPage() <= 1) return ;
-				table.removeAll();
-				try {
-					CodeDetail[] codeDetails = githubCodeSearch.PrepPageSearch();
-					table.setItemCount(codeDetails.length);
-					for(int i=0;i<codeDetails.length;i++){
-						table.getItem(i).setText(new String[]{String.valueOf((githubCodeSearch.getInformation().getCurrentPage()-1)*100+i+1),
-								codeDetails[i].getName(),codeDetails[i].getOwner(),codeDetails[i].getRepo(),codeDetails[i].getDownloadURL()});
-					}
-					new Thread(){
-						public void run() {
-							display.syncExec(pageUpdate);
-						}
-					}.start();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public void mouseDoubleClick(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-        shell.open();
+		shell.open();
 		while(!shell.isDisposed()){
 			if(!display.readAndDispatch()) display.sleep();
 		}

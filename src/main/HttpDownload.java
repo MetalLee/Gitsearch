@@ -11,7 +11,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 
-public class GithubCodeDownload {
+public class HttpDownload {
 	URL url;
 	
 	String savePath = "";
@@ -20,7 +20,7 @@ public class GithubCodeDownload {
 	
 	File file = null;
 	
-	GithubCodeDownload() {
+	HttpDownload() {
 	}
 	public void setURL(String url) throws MalformedURLException {
 		this.url = new URL(url);	
@@ -40,8 +40,6 @@ public class GithubCodeDownload {
         httpURLConnection.setRequestProperty("Charset", "UTF-8");
         httpURLConnection.connect();
         
-        int fileLength = httpURLConnection.getContentLength();
-        System.out.println(fileLength);
         BufferedInputStream bin = new BufferedInputStream(httpURLConnection.getInputStream());
         String path = savePath + File.separator + fileName;
         file = new File(path);
@@ -52,12 +50,9 @@ public class GithubCodeDownload {
         }
         OutputStream outputStream = new FileOutputStream(file);
         int size = 0;
-        int len = 0;
         byte[] buf = new byte[1024];
         while((size = bin.read(buf)) != -1){
-        	len+=size;
         	outputStream.write(buf, 0, size);
-        	System.out.println(len*100/fileLength);
         }
         bin.close();
         outputStream.close();

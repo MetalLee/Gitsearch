@@ -1,17 +1,19 @@
-package bean;
+package main;
 
-public class SearchCodeResult {
+import org.eclipse.egit.github.core.Repository;
+
+public class SearchResult {
     int total_count;
     
     boolean incomplete_results;
     
-    CodeURL[] items;
+    Repository[] items;
     
     public int getTotal_count() {
 		return total_count;
 	}
     
-    public CodeURL[] getItems(){
+    public Repository[] getItems(){
     	return items;
     }
     
