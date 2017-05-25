@@ -42,12 +42,13 @@ public class Main {
 		Text usernameInput = new Text(shell, SWT.SINGLE);
 		
 		usernameInput.setLayoutData(inputGridData);
-		usernameInput.setText("461741038@qq.com");
+		
 		Label passwordLabel = new Label(shell, SWT.SINGLE);
 		passwordLabel.setText("Password:");
 		Text passwordInput = new Text(shell, SWT.PASSWORD);
+		
 		passwordInput.setLayoutData(inputGridData);
-		passwordInput.setText("klee654944");
+		
 		//Search option
 		Label keywordLabel = new Label(shell, SWT.SINGLE);
 		keywordLabel.setText("Keyword:");
@@ -68,7 +69,7 @@ public class Main {
 		Button directoryButton = new Button(shell, SWT.PUSH);
 		directoryButton.setText("Browse");
 		GridData directoryGridData = new GridData();
-		directoryGridData.horizontalSpan = 2;
+		directoryGridData.horizontalSpan = 10;
 		Label directoryLabel = new Label(shell, SWT.SINGLE);
 		directoryLabel.setText("Please choose a directory");
 		directoryLabel.setLayoutData(directoryGridData);
