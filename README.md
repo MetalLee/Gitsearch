@@ -1,22 +1,19 @@
 # Gitsearch
-This is a tool that can help you search codes and download mutiple code files from [Github](github.com) or other Github enterprise easily just by a few steps.Currently it only supports java file searching but in the future a language option will be added to the tool.This tool's function is based on [Egit](http://www.eclipse.org/egit/).
+This is a tool that can help you search codes and download mutiple Repositories from [Github](github.com) or other Github enterprise easily just by a few steps.Currently it only supports java file searching but in the future a language option will be added to the tool.This tool's function is based on [Egit](http://www.eclipse.org/egit/).
 ## Library Required
 1. Gson 2.8.0;
 2. SWT 3.105;
 3. Egit 2.1.5;
 ## User Interface Overview
-![](http://i.imgur.com/aIVCXxS.png)
+![](http://i.imgur.com/uH1e8ik.png)
 ## How to Use
 ### Step1:Enter your username and password for authentication:  
-![](http://i.imgur.com/NkGYpyb.png)  
-
 
 ### Step2:Enter the keyword the click the 'Search' button and wait seconds
-![](http://i.imgur.com/jknZ3R3.png)
 
-### Step3:Select the file you want to download from the table
+### Step3:Select the Repositories you want to download from the table
 
-![](http://i.imgur.com/xGTf31L.png)
+![](http://i.imgur.com/KeQ1Qz7.png)
 
 ### Step4:Choose a local directory
 
