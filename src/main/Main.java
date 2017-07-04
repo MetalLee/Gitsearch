@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 
-
 public class Main {
 	public static void main(String[] args) throws IOException {
 		GithubRepositorySearch search = new GithubRepositorySearch();

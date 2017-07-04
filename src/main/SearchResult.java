@@ -20,4 +20,5 @@ public class SearchResult {
     public boolean isIncomplete() {
 		return incomplete_results;
 	}
+    
 }
