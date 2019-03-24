@@ -6,7 +6,7 @@ Gitsearch is a tool that can help you search code snippets and download mutiple 
 2. SWT 3.105;
 3. Egit 2.1.5;
 
-## User Interface Overview
+## UI Overview
 ![](http://i.imgur.com/uH1e8ik.png)
 
 ## How to Use
@@ -26,3 +26,16 @@ Gitsearch is a tool that can help you search code snippets and download mutiple 
 ![](http://i.imgur.com/vKzwbPk.png)
 
 ### Congratulations! Now the files have been successfully downloaded!
+
+## Bonus: How to compile & edit the tool on Apache NetBeans
+
+### Convert
+1. Clone the repo
+2. Fire up NetBeans, go to File -> Import project -> Eclipse project
+3. Pick "Import Project ignoring Project Dependencies"
+	* For "Project to import", pick the repo directory you just cloned
+	* For "Destination folder", pick another folder where you'd store the Netbeans project files
+4. Click on "Finish"
+
+### Compile 
+* Go to Run -> Clean and Build project
